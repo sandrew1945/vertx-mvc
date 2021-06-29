@@ -1,0 +1,8 @@
+mvc:
+  server:
+    port: 8080
+    instances-count: 1
+  component:
+    scan-basepackages:
+      - com.sandrew.demo
+      - com.sandrew.demo2
