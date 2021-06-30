@@ -2,6 +2,9 @@ mvc:
   server:
     port: 8080
     instances-count: 1
+  blockcheck:
+    execute-time: 2000
+    warning: true
   component:
     scan-basepackages:
       - com.sandrew.demo

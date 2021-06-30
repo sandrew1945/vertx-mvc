@@ -39,9 +39,6 @@ public class ConfigurationHandler
                     .addStore(jvmStore);
 
             ConfigRetriever retriever = ConfigRetriever.create(vertx, options);
-//            retriever.getConfig(jsonObjectAsyncResult -> {
-//
-//            });
 
             retriever.configStream().handler(jsonObject -> {
                 try
