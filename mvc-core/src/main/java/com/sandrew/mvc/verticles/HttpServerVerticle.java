@@ -1,4 +1,4 @@
-package com.sandrew.mvc;
+package com.sandrew.mvc.verticles;
 
 import com.sandrew.mvc.annotation.Controller;
 import com.sandrew.mvc.annotation.RequestMapping;
@@ -32,7 +32,7 @@ import java.util.Set;
 /**
  * Created by summer on 2020/4/23.
  */
-public class MainVerticle extends AbstractVerticle
+public class HttpServerVerticle extends AbstractVerticle
 {
     private HttpServer httpServer;
     private Router router;

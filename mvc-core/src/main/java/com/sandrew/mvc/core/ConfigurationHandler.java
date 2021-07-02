@@ -56,35 +56,6 @@ public class ConfigurationHandler
             });
             return null;
         });
-        /*
-        // 处理yaml格式store
-        ConfigStoreOptions yamlStore = new ConfigStoreOptions()
-                .setType("file")
-                .setFormat("yaml")
-                .setConfig(new JsonObject()
-                        .put("path", "config.yaml")
-                        .put("hierarchical", true)
-                );
-
-        // 处理properties格式store
-        // 处理jvm变量store
-
-        ConfigRetrieverOptions options = new ConfigRetrieverOptions()
-                .addStore(yamlStore);
-
-        ConfigRetriever retriever = ConfigRetriever.create(vertx, options);
-        retriever.configStream().handler(jsonObject -> {
-            try
-            {
-                parseConfiguration(jsonObject, vertx);
-            }
-            catch (ParseException e)
-            {
-                e.printStackTrace();
-                throw new RuntimeException(e.getMessage(), e);
-            }
-        });
-         */
     }
 
     /**
