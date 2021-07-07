@@ -3,11 +3,13 @@ package com.sandrew.mvc.verticles;
 import com.sandrew.mvc.annotation.Controller;
 import com.sandrew.mvc.annotation.RequestMapping;
 import com.sandrew.mvc.core.RequestMethod;
+import com.sandrew.mvc.log.Logger;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.auth.KeyStoreOptions;
 import io.vertx.ext.auth.jwt.JWTAuth;
@@ -40,7 +42,9 @@ public class HttpServerVerticle extends AbstractVerticle
     @Override
     public void start() throws Exception
     {
-        httpServer = vertx.createHttpServer();
+        HttpServerOptions op = new HttpServerOptions();
+        op.setCompressionSupported(true);
+        httpServer = vertx.createHttpServer(op);
         router = Router.router(vertx);
         vertx.executeBlocking(this::parseMapping, this::resultHandler);
         // 解析配置文件，支持yaml,properties,jvm变量，优先级: jvm变量 > properties文件 > yaml文件
@@ -90,11 +94,12 @@ public class HttpServerVerticle extends AbstractVerticle
             Set<Class<?>> set = f.getTypesAnnotatedWith(Controller.class);
             for (Class<?> clz : set)
             {
-                System.out.println("class : " + clz.getName());
-                Router methodRouter = handleMethodRouter(clz);
+                Controller controllerAnn = clz.getAnnotation(Controller.class);
+
+                Router methodRouter = handleMethodRouter(clz, controllerAnn.value().endsWith("/") ? controllerAnn.value().substring(1) : controllerAnn.value());
 
                 Router classRouter = Router.router(vertx);
-                Controller controllerAnn = clz.getAnnotation(Controller.class);
+
                 if (StringUtils.isEmpty(controllerAnn.value()))
                 {
                     classRouter.mountSubRouter("/", methodRouter);
@@ -134,7 +139,7 @@ public class HttpServerVerticle extends AbstractVerticle
      * @throws IllegalAccessException
      * @throws InstantiationException
      */
-    private Router handleMethodRouter(Class<?> controllClz) throws IllegalAccessException, InstantiationException
+    private Router handleMethodRouter(Class<?> controllClz, String classPath) throws IllegalAccessException, InstantiationException
     {
         Object bean = controllClz.newInstance();
         Router methodRouter = Router.router(vertx);
@@ -142,7 +147,7 @@ public class HttpServerVerticle extends AbstractVerticle
         for (Method m : methodsInController)
         {
 
-            System.out.println("method ----->" + m.getName());
+            Logger.debug("method ----->" + m.getName());
             RequestMapping requestMapping = m.getAnnotation(RequestMapping.class);
             RequestMethod[] httpMethods = requestMapping.method();
             if (requestMapping.value().length == 0)
@@ -152,7 +157,7 @@ public class HttpServerVerticle extends AbstractVerticle
             else
             {
                 Arrays.stream(requestMapping.value()).forEach(path -> {
-                    handleRouter(methodRouter, bean, m, path, httpMethods);
+                    handleRouter(methodRouter, bean, m, classPath, path, httpMethods);
                 });
             }
         }
@@ -164,22 +169,21 @@ public class HttpServerVerticle extends AbstractVerticle
      * @param router
      * @param originObj
      * @param invokeMethod
-     * @param path
+     * @param classPath
+     * @param methodPath
      * @param requestMethods
      */
-    private void handleRouter(Router router, Object originObj, Method invokeMethod, String path, RequestMethod[] requestMethods)
+    private void handleRouter(Router router, Object originObj, Method invokeMethod, String classPath, String methodPath, RequestMethod[] requestMethods)
     {
-        Route route = router.route(path);
+        Route route = router.route(methodPath);
         if (null != requestMethods && requestMethods.length > 0)
         {
             Arrays.stream(requestMethods).forEach(requestMethod -> route.method(convert(requestMethod)));
         }
-//        route.handler(ctx -> {
-//            ctx.request().setExpectMultipart(true);
-//            ctx.next();
-//        });
+
+        Logger.debug("path ------->" + classPath + methodPath);
         // TODO 通过白名单处理
-        if (!"/login".equals(path))
+        if (!"/login".equals(classPath + methodPath))
         {
             route.handler(JWTAuthHandler.create((JWTAuth) vertx.getOrCreateContext().config().getValue("jwt")));
         }

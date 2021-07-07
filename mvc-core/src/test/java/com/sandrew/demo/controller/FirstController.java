@@ -6,6 +6,7 @@ import com.sandrew.mvc.annotation.RequestMapping;
 import com.sandrew.mvc.core.RequestMethod;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
+import io.vertx.core.http.HttpHeaders;
 import io.vertx.ext.web.FileUpload;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.Session;
@@ -117,6 +118,28 @@ public class FirstController
 
             context.response().putHeader("content-type", "text/plain");
             context.response().end("f_handler3");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            throw new Exception(e.getMessage(), e);
+        }
+    }
+
+    /**
+     *  测试返回文件
+     * @param context
+     * @throws Exception
+     */
+    @RequestMapping("/f_handler4")
+    public void f_handler4(RoutingContext context) throws Exception
+    {
+        try
+        {
+            System.out.println("do sth in f_handler4");
+
+            context.response().putHeader(HttpHeaders.CONTENT_ENCODING, HttpHeaders.IDENTITY);
+            context.response().sendFile("/Users/summer/Documents/LocalFilePath/science/guest/2018110515475538281.xml");
         }
         catch (Exception e)
         {
