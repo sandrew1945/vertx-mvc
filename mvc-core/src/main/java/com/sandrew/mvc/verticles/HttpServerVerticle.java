@@ -7,10 +7,7 @@ import com.sandrew.mvc.log.Logger;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Promise;
-import io.vertx.core.http.HttpMethod;
-import io.vertx.core.http.HttpServer;
-import io.vertx.core.http.HttpServerOptions;
-import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.http.*;
 import io.vertx.ext.auth.KeyStoreOptions;
 import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.auth.jwt.JWTAuthOptions;
@@ -183,7 +180,7 @@ public class HttpServerVerticle extends AbstractVerticle
 
         Logger.debug("path ------->" + classPath + methodPath);
         // TODO 通过白名单处理
-        if (!"/login".equals(classPath + methodPath))
+        if (!"/f/f_handler4".equals(classPath + methodPath))
         {
             route.handler(JWTAuthHandler.create((JWTAuth) vertx.getOrCreateContext().config().getValue("jwt")));
         }
@@ -202,6 +199,7 @@ public class HttpServerVerticle extends AbstractVerticle
                 e.printStackTrace();
             }
         });
+
         // 捕获异常
         route.failureHandler(failureCtx -> {
 

@@ -29,7 +29,9 @@ public class MainVerticle extends AbstractVerticle
             Logger.debug("Waiting to stop httpserver.....");
             verticleIds.stream().forEach(vid -> {
                 Logger.debug("httpserver(" + vid + ") is undeploy");
-                vertx.undeploy(vid);
+                vertx.undeploy(vid).onSuccess(aVoid -> {
+                    Logger.info("Management server is stopped!");
+                });
             });
             verticleIds.clear();
             context.response().end("HttpServer stoped!");
@@ -53,12 +55,12 @@ public class MainVerticle extends AbstractVerticle
     {
         if (verticleIds.size() >= 1)
         {
-            Logger.debug("HttpServer has bean started!");
+            Logger.debug("Manager server has bean started!");
             return;
         }
         // 启动配置解析verticle
         vertx.deployVerticle(new ConfigurationVerticle(), ar -> {
-            Logger.debug("HttpServer is started! vid:" + ar.result());
+            Logger.debug("Configuration Server is started! vid:" + ar.result());
             verticleIds.add(ar.result());
         });
     }

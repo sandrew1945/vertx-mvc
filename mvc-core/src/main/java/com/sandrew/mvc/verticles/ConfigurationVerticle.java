@@ -36,6 +36,7 @@ public class ConfigurationVerticle extends AbstractVerticle
             config.setPort(vertx.getOrCreateContext().get("server-port"));
             options.setConfig(JsonObject.mapFrom(config));
             vertx.deployVerticle("com.sandrew.mvc.verticles.HttpServerVerticle", options, ar -> {
+                Logger.debug("Http server is started! vid:" + ar.result());
                 verticleIds.add(ar.result());
             });
         });
@@ -44,6 +45,7 @@ public class ConfigurationVerticle extends AbstractVerticle
     @Override
     public void stop(Promise<Void> stopPromise) throws Exception
     {
+        System.out.println("stop-------------------");
         super.stop(stopPromise);
         verticleIds.stream().forEach(vid -> {
             Logger.debug("Undeploy verticle:" + vid);

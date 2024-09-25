@@ -127,7 +127,7 @@ public class FirstController
     }
 
     /**
-     *  测试返回文件
+     *  测试下载文件
      * @param context
      * @throws Exception
      */
@@ -139,6 +139,8 @@ public class FirstController
             System.out.println("do sth in f_handler4");
 
             context.response().putHeader(HttpHeaders.CONTENT_ENCODING, HttpHeaders.IDENTITY);
+            context.response().putHeader("Content-Type", "application/download");
+            context.response().putHeader("Content-Disposition", "attachment;filename=123.xml");
             context.response().sendFile("/Users/summer/Documents/LocalFilePath/science/guest/2018110515475538281.xml");
         }
         catch (Exception e)
